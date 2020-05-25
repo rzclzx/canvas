@@ -1,6 +1,31 @@
 <template>
-  <div>
-    <div id="mountNode"></div>
+  <div class="graph">
+    <div class="header"></div>
+    <div class="flex-between-start">
+      <div class="panel" id="mountNode"></div>
+      <div>
+        <el-card>
+          <div slot="header">
+            <span>图谱详情</span>
+          </div>
+          <el-table
+            :data="tableData" 
+            size="mini"
+          >
+            <el-table-column
+              label="属性名称"
+              align="center"
+              prop="label"
+            ></el-table-column>
+            <el-table-column
+              label="属性值"
+              align="center"
+              prop="value"
+            ></el-table-column>
+          </el-table>
+        </el-card>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -8,13 +33,13 @@
 import G6 from '@antv/g6';
 import options from './options';
 export default {
-  components: {
-    
-  },
+  components: {},
   data () {
     return {
       options,
-      data: {}
+      data: {},
+      graph: {},
+      tableData: []
     }
   },
   mounted () {
@@ -26,49 +51,71 @@ export default {
         'https://gw.alipayobjects.com/os/basement_prod/6cae02ab-4c29-44b2-b1fd-4005688febcb.json'
       );
       this.data = await res.json();
-      const graph = new G6.Graph(this.options);
-      graph.data(this.data);
-      graph.render();
-      this.addEvent(graph)
+      this.graph = new G6.Graph(this.options);
+      this.graph.data(this.data);
+      this.graph.render();
+      this.addEvent();
     },
-    addEvent (graph) {
-      graph.on('node:mouseenter', e => {
+    addEvent () {
+      this.addHover();
+      this.addNodeClick();
+      this.addEdgeClick();
+    },
+    addHover () {
+      this.graph.on('node:mouseenter', e => {
         const nodeItem = e.item; // 获取鼠标进入的节点元素对象
-        graph.setItemState(nodeItem, 'hover', true); // 设置当前节点的 hover 状态为 true
+        this.graph.setItemState(nodeItem, 'hover', true); // 设置当前节点的 hover 状态为 true
       });
-
-      // 鼠标离开节点
-      graph.on('node:mouseleave', e => {
+      this.graph.on('node:mouseleave', e => {
         const nodeItem = e.item; // 获取鼠标离开的节点元素对象
-        graph.setItemState(nodeItem, 'hover', false); // 设置当前节点的 hover 状态为 false
+        this.graph.setItemState(nodeItem, 'hover', false); // 设置当前节点的 hover 状态为 false
       });
-
-      // 点击节点
-      graph.on('node:click', e => {
-        // 先将所有当前是 click 状态的节点置为非 click 状态
-        const clickNodes = graph.findAllByState('node', 'click');
-        clickNodes.forEach(cn => {
-          graph.setItemState(cn, 'click', false);
-        });
+    },
+    removeClick () {
+      this.graph.findAllByState('node', 'click').forEach(cn => {
+        this.graph.setItemState(cn, 'click', false);
+      });
+      this.graph.findAllByState('edge', 'click').forEach(ce => {
+        this.graph.setItemState(ce, 'click', false);
+      });
+    },
+    addNodeClick () {
+      this.graph.on('node:click', e => {
+        this.removeClick();
         const nodeItem = e.item; // 获取被点击的节点元素对象
-        graph.setItemState(nodeItem, 'click', true); // 设置当前节点的 click 状态为 true
+        const obj = nodeItem.getModel();
+        this.tableData = [];
+        this.tableData.push({
+          label: '名称',
+          value: obj.label
+        })
+        this.graph.setItemState(nodeItem, 'click', true); // 设置当前节点的 click 状态为 true
       });
-
-      // 点击边
-      graph.on('edge:click', e => {
-        // 先将所有当前是 click 状态的边置为非 click 状态
-        const clickEdges = graph.findAllByState('edge', 'click');
-        clickEdges.forEach(ce => {
-          graph.setItemState(ce, 'click', false);
-        });
+    },
+    addEdgeClick () {
+      this.graph.on('edge:click', e => {
+        this.removeClick();
         const edgeItem = e.item; // 获取被点击的边元素对象
-        graph.setItemState(edgeItem, 'click', true); // 设置当前边的 click 状态为 true
+        const obj = edgeItem.getModel();
+        this.tableData = [];
+        this.tableData.push({
+          label: '名称',
+          value: obj.label
+        })
+        this.graph.setItemState(edgeItem, 'click', true); // 设置当前边的 click 状态为 true
       });
     }
   }
 }
 </script>
 
-<style scoped>
-  
+<style lang="less" scoped>
+  .graph {
+    width: 100%;
+    height: 1080px;
+    .header {
+      height: 80px;
+      background: #7CC8FB;
+    }
+  }
 </style>
