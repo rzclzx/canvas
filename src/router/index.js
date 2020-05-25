@@ -8,7 +8,7 @@ export default new Router({
     {
       path: '/',
       name: 'Index',
-      component: resolve => require(['@/pages/trade/index'], resolve)
+      component: resolve => require(['@/pages/index/home'], resolve)
     },
     {
       path: '/CookiePathTest',
@@ -19,6 +19,11 @@ export default new Router({
       path: '/canvas/:id',
       name: 'canvas',
       component: resolve => require(['@/pages/canvas/index'], resolve)
+    },
+    {
+      path: '/g6',
+      name: 'g6',
+      component: resolve => require(['@/pages/g6/index'], resolve)
     }
   ]
 })
