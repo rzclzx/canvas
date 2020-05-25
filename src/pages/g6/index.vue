@@ -1,7 +1,19 @@
 <template>
   <div class="graph">
     <div class="header"></div>
-    <div class="flex-between-start">
+    <div class="flex-between-start" style="position:relative">
+      <div class="scroll">
+        <el-slider
+          v-model="size"
+          vertical
+          :min="0.2"
+          :max="2"
+          :step="0.2"
+          height="200px"
+          @change="scale"
+        >
+        </el-slider>
+      </div>
       <div class="panel" id="mountNode"></div>
       <div>
         <el-card>
@@ -36,6 +48,7 @@ export default {
   components: {},
   data () {
     return {
+      size: 1,
       options,
       data: {},
       graph: {},
@@ -46,6 +59,21 @@ export default {
     this.init();
   },
   methods: {
+    scale () {
+      this.graph.zoomTo(this.size, this.getCenter())
+    },
+    getCenter () {
+      let x = [];
+      let y = [];
+      this.data.nodes.forEach(item => {
+        x.push(item.x);
+        y.push(item.y);
+      })
+      return {
+        x: (Math.min.apply(null,x) + Math.max.apply(null,x))/2,
+        y: (Math.min.apply(null,y) + Math.max.apply(null,y))/2
+      }
+    },
     async init () {
       const res = await fetch(
         'https://gw.alipayobjects.com/os/basement_prod/6cae02ab-4c29-44b2-b1fd-4005688febcb.json'
@@ -84,6 +112,7 @@ export default {
         this.removeClick();
         const nodeItem = e.item; // 获取被点击的节点元素对象
         const obj = nodeItem.getModel();
+        console.log(obj)
         this.tableData = [];
         this.tableData.push({
           label: '名称',
@@ -117,5 +146,11 @@ export default {
       height: 80px;
       background: #7CC8FB;
     }
+  }
+  .scroll {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 50px;
   }
 </style>
