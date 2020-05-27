@@ -9,7 +9,7 @@ export default {
     linkDistance: 100, // 指定边距离为100
   },
   modes: {
-    default: ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
+    default: ['drag-canvas', 'drag-node', 'activate-relations'], // 允许拖拽画布、拖拽节点
   },
   defaultNode: {
     size: 30,
@@ -39,7 +39,7 @@ export default {
     click: {
       fill: '#7CC8FB',
       stroke: '#7CC8FB'
-    },
+    }
   },
   // 边不同状态下的样式集合
   edgeStateStyles: {

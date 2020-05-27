@@ -1,5 +1,5 @@
 <template>
-  <div class="graph">
+  <div class="graph" @click="allInit">
     <div class="header"></div>
     <div class="flex-between-start" style="position:relative">
       <div class="scroll">
@@ -10,7 +10,7 @@
           :max="2"
           :step="0.2"
           height="200px"
-          @change="scale"
+          @input="scale"
         >
         </el-slider>
       </div>
@@ -36,6 +36,7 @@
             ></el-table-column>
           </el-table>
         </el-card>
+        <!-- <el-button @click="downloadImage">导出图片</el-button> -->
       </div>
     </div>
   </div>
@@ -52,7 +53,8 @@ export default {
       options,
       data: {},
       graph: {},
-      tableData: []
+      tableData: [],
+      state: false
     }
   },
   mounted () {
@@ -60,12 +62,15 @@ export default {
   },
   methods: {
     scale () {
-      this.graph.zoomTo(this.size, this.getCenter())
+      if (this.graph.zoomTo) {
+        this.graph.zoomTo(this.size, this.getCenter())
+      }
     },
     getCenter () {
       let x = [];
       let y = [];
-      this.data.nodes.forEach(item => {
+      let nodes = this.data.nodes || [];
+      nodes.forEach(item => {
         x.push(item.x);
         y.push(item.y);
       })
@@ -109,10 +114,12 @@ export default {
     },
     addNodeClick () {
       this.graph.on('node:click', e => {
+        this.state = true;
         this.removeClick();
+        this.hideAll();
         const nodeItem = e.item; // 获取被点击的节点元素对象
         const obj = nodeItem.getModel();
-        console.log(obj)
+        this.showClick(obj.id);
         this.tableData = [];
         this.tableData.push({
           label: '名称',
@@ -121,8 +128,39 @@ export default {
         this.graph.setItemState(nodeItem, 'click', true); // 设置当前节点的 click 状态为 true
       });
     },
+    hideAll () {
+      this.data.nodes.forEach(item =>{
+        this.graph.hideItem(item.id);
+      })
+    },
+    allInit () {
+      if (this.state) {
+        this.state = false;
+      } else {
+        this.data.nodes.forEach(item =>{
+          this.graph.showItem(item.id);
+          this.removeClick();
+        })
+      }
+    },
+    showClick (id) {
+      let list = [];
+      list.push(id);
+      this.data.edges.forEach(item =>{
+        if (item.source == id) {
+          list.push(item.target);
+        }
+        if (item.target == id) {
+          list.push(item.source);
+        }
+      });
+      list.forEach(item => {
+        this.graph.showItem(item);
+      })
+    },
     addEdgeClick () {
       this.graph.on('edge:click', e => {
+        this.state = true;
         this.removeClick();
         const edgeItem = e.item; // 获取被点击的边元素对象
         const obj = edgeItem.getModel();
@@ -133,6 +171,9 @@ export default {
         })
         this.graph.setItemState(edgeItem, 'click', true); // 设置当前边的 click 状态为 true
       });
+    },
+    downloadImage () {
+      this.graph.downloadImage();
     }
   }
 }
