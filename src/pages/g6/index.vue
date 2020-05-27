@@ -85,9 +85,23 @@ export default {
       );
       this.data = await res.json();
       this.graph = new G6.Graph(this.options);
+      this.dataInit();
+      console.log(this.data)
       this.graph.data(this.data);
       this.graph.render();
       this.addEvent();
+    },
+    dataInit () {
+      this.data.nodes.forEach(item =>{
+        if (item.id == 0) [
+          item.size = 50
+        ]
+      })
+      this.data.edges.forEach(item => {
+        if (item.label == 'e0-4') {
+          item.color = '#F07676'
+        }
+      })
     },
     addEvent () {
       this.addHover();
