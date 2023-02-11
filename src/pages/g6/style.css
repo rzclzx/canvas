@@ -1,0 +1,16 @@
+.panel {
+    border: solid 1px #bebebe;
+}
+.pip {
+    width: 100%;
+    height: 100%;
+}
+.node {
+    width: 100%;
+    height: 100%;
+    border: #409EFF;
+    background-color: #409EFF;
+    color: #fff;
+    line-height: 50px;
+    text-align: center;
+}

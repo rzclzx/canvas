@@ -12,7 +12,7 @@
     "test": "node build/test.js"
   },
   "dependencies": {
-    "@antv/g6": "^3.5.0",
+    "@antv/g6": "4.8.5",
     "axios": "^0.17.1",
     "element-ui": "^2.4.7",
     "screenfull": "^3.3.3",
